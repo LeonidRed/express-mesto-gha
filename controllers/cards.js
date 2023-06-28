@@ -27,7 +27,12 @@ const deleteCard = (req, res) => {
       }
       return res.status(OK).send({ data: card })
     })
-    .catch(err => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' }))
+    .catch(err => {
+      if (err.name === 'CastError') {
+        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' })
+      }
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
+    })
 }
 
 const addCardLike = (req, res) => {
@@ -42,7 +47,7 @@ const addCardLike = (req, res) => {
       return res.status(OK).send({ data: card })
     })
     .catch(err => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки/снятии лайка' })
       }
       return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
@@ -61,7 +66,7 @@ const removeCardLike = (req, res) => {
       return res.status(OK).send({ data: card })
     })
     .catch(err => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные для постановки/снятии лайка' })
       }
       return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
