@@ -27,7 +27,12 @@ const findUserById = (req, res) => {
       }
       return res.status(OK).send({ data: user })
     })
-    .catch(err => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' }))
+    .catch(err => {
+      if (err.name === 'ValidationError') {
+        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля' })
+      }
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
+    })
 }
 
 const updateUser = (req, res) => {
