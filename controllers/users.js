@@ -28,8 +28,8 @@ const findUserById = (req, res) => {
       return res.status(OK).send({ data: user })
     })
     .catch(err => {
-      if (err.name === 'ValidationError') {
-        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля' })
+      if (err.name === 'CastError') {
+        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные пользователя' })
       }
       return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
     })
@@ -40,7 +40,8 @@ const updateUser = (req, res) => {
   User.findByIdAndUpdate(
     req.user._id,
     { name, about },
-    { new: true }
+    { new: true },
+    { runValidators: true }
   )
     .then(user => {
       if (!user) {
