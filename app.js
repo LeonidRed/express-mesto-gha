@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 // мидлвэр для временного решения авторизации
 // app.use((req, res, next) => {
 //   req.user = {
-//     _id: '649b0dc20fc9ee778e78b3d9',
+//     _id: '64a59ed68f663149610f9826',
 //   }
 
 //   next()
@@ -37,6 +37,8 @@ app.post('/signin', login)
 app.post('/signup', createUser)
 app.use(auth, userRoutes)
 app.use(auth, cardRoutes)
+// app.use(userRoutes)
+// app.use(cardRoutes)
 app.use('*', (req, res) => res.status(404).send({ message: 'Такого пути не существует' }))
 
 app.use(express.static(path.join(__dirname, 'public')))

@@ -6,11 +6,11 @@ module.exports = (req, res, next) => {
   if (!authorization || !authorization.startsWith('Bearer ')) {
     return res
       .status(401)
-      .send({ message: 'Необходима авторизация' })
+      .send({ message: 'Необходима авторизация1' })
   }
 
   const token = authorization.replace('Bearer ', '')
-  let payload;
+  let payload
 
   try {
     payload = jwt.verify(token, 'some-secret-key')

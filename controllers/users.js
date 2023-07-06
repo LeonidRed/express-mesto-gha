@@ -121,7 +121,7 @@ const login = (req, res) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       // создадим токен
-      const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' })
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' })
 
       // вернём токен
       res.send({ token })
@@ -131,6 +131,12 @@ const login = (req, res) => {
     })
 }
 
+const getCurrentUser = (req, res) => {
+  User.findById(req.user._id)
+    .then((user) => res.status(OK).send({ data: user }))
+    .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' }))
+}
+
 module.exports = {
-  getUsers, createUser, findUserById, updateUser, updateUserAvatar, login,
+  getUsers, createUser, findUserById, updateUser, updateUserAvatar, login, getCurrentUser,
 }
