@@ -4,6 +4,7 @@ const User = require('../models/user')
 const NotFoundError = require('../errors/not-found-err')
 const BadRequestErr = require('../errors/bad-request-err')
 const UnauthorizedErr = require('../errors/unauthorized-err')
+const ConflictErr = require('../errors/conflict-err')
 
 const {
   // OK, CREATED, BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR,
@@ -26,12 +27,14 @@ const createUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.status(CREATED).send({ data: user }))
+    .then(() => res.status(CREATED).send({ message: 'Пользователь зарегистирован' }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestErr('Переданы некорректные данные при создании пользователя'))
         // return res.status(BAD_REQUEST)
         // .send({ message: 'Переданы некорректные данные при создании пользователя' })
+      } else if (err.code === 11000) {
+        next(new ConflictErr('Такой email адрес уже зарегистрирован'))
       }
       next(err)
       // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
