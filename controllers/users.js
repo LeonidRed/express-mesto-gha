@@ -7,7 +7,6 @@ const UnauthorizedErr = require('../errors/unauthorized-err')
 const ConflictErr = require('../errors/conflict-err')
 
 const {
-  // OK, CREATED, BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR,
   OK, CREATED,
 } = require('../utils/errors')
 
@@ -15,8 +14,6 @@ const getUsers = (req, res, next) => {
   User.find({})
     .then((user) => res.status(OK).send({ data: user }))
     .catch(next)
-  // .catch(() => res.status(INTERNAL_SERVER_ERROR)
-  // .send({ message: 'Произошла ошибка' }))
 }
 
 const createUser = (req, res, next) => {
@@ -27,18 +24,19 @@ const createUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    // .then(() => res.status(CREATED).send({ message: 'Пользователь зарегистрирован' }))
-    .then((user) => res.status(CREATED).send(user))
+    .then((user) => res.status(CREATED).send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestErr('Переданы некорректные данные при создании пользователя'))
-        // return res.status(BAD_REQUEST)
-        // .send({ message: 'Переданы некорректные данные при создании пользователя' })
       } else if (err.code === 11000) {
         next(new ConflictErr('Такой email адрес уже зарегистрирован'))
       }
       next(err)
-      // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
     })
 }
 
@@ -47,19 +45,14 @@ const findUserById = (req, res, next) => {
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь по указанному _id не найден')
-        // return res.status(NOT_FOUND)
-        // .send({ message: 'Пользователь по указанному _id не найден' })
       }
       return res.status(OK).send({ data: user })
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestErr('Переданы некорректные данные пользователя'))
-        // return res.status(BAD_REQUEST)
-        // .send({ message: 'Переданы некорректные данные пользователя' })
       }
       next(err)
-      // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
     })
 }
 
@@ -76,18 +69,14 @@ const updateUser = (req, res, next) => {
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден')
-        // return res.status(NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден' })
       }
       return res.status(OK).send({ data: user })
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestErr('Переданы некорректные данные пользователя'))
-        // return res.status(BAD_REQUEST)
-        // .send({ message: 'Переданы некорректные данные при обновлении профиля' })
       }
       next(err)
-      // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
     })
 }
 
@@ -101,45 +90,16 @@ const updateUserAvatar = (req, res, next) => {
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден')
-        // return res.status(NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден' })
       }
       return res.status(OK).send({ data: user })
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestErr('ППереданы некорректные данные при обновлении аватара'))
-        // return res.status(BAD_REQUEST)
-        // .send({ message: 'Переданы некорректные данные при обновлении аватара' })
       }
       next(err)
-      // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
     })
 }
-
-// const login = (req, res) => {
-//   const { email, password } = req.body
-
-//   User.findOne({ email })
-//     .then((user) => {
-//       if (!user) {
-//         return Promise.reject(new Error('Неправильные почта или пароль'))
-//       }
-
-//       return bcrypt.compare(password, user.password)
-//         .then((matched) => {
-//           if (!matched) {
-//             // хеши не совпали — отклоняем промис
-//             return Promise.reject(new Error('Неправильные почта или пароль'))
-//           }
-//           const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' })
-//           // аутентификация успешна
-//           return res.send({ token })
-//         })
-//         .catch((err) => {
-//           res.status(NOT_FOUND).send({ message: err.message })
-//         })
-//     })
-// }
 
 const login = (req, res, next) => {
   const { email, password } = req.body
@@ -155,8 +115,6 @@ const login = (req, res, next) => {
     })
     .catch(() => {
       next(new UnauthorizedErr('Неудачная попытка авторизации'))
-      // res.status(401).send({ message: err.message })
-      // res.status(401).send({ message: 'Неудачная попытка авторизации' })
     })
 }
 
@@ -164,7 +122,6 @@ const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => res.status(OK).send({ data: user }))
     .catch(next)
-  // .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' }))
 }
 
 module.exports = {

@@ -10,7 +10,6 @@ const getCards = (req, res, next) => {
   Card.find({})
     .then((card) => res.status(OK).send({ data: card }))
     .catch(next)
-  // .catch(() => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' }))
 }
 
 const createCard = (req, res, next) => {
@@ -20,11 +19,8 @@ const createCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestErr('Переданы некорректные данные в методы создания карточки'))
-        // return res.status(BAD_REQUEST)
-        // .send({ message: 'Переданы некорректные данные в методы создания карточки' })
       }
       next(err)
-      // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
     })
 }
 
@@ -32,14 +28,10 @@ const deleteCard = (req, res, next) => {
   console.log(req.params.cardId)
   Card.findById(req.params.cardId)
     .then((card) => {
-      // console.log(card.owner.toString())
-      // console.log(req.user._id)
       if (!card) {
         throw new NotFoundError('Карточка с указанным _id не найдена')
-        // res.status(NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' })
       } else if (card.owner.toString() !== req.user._id) {
         throw new ForbiddeErr('У вас нет прав на удаление этой карточки')
-        // res.status(BAD_REQUEST).send({ message: 'У вас нет прав на удаление этой карточки' })
       } else {
         Card.findByIdAndRemove(req.params.cardId).then(() => res.status(OK).send({ message: 'Карточка удалена' }))
       }
@@ -47,28 +39,10 @@ const deleteCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestErr('Переданы некорректные данные'))
-        // return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' })
       }
       next(err)
-      // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
     })
 }
-
-// const deleteCard = (req, res) => {
-//   Card.findByIdAndRemove(req.params.cardId)
-//     .then((card) => {
-//       if (!card) {
-//         return res.status(NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' })
-//       }
-//       return res.status(OK).send({ data: card })
-//     })
-//     .catch((err) => {
-//       if (err.name === 'CastError') {
-//         return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' })
-//       }
-//       return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
-//     })
-// }
 
 const addCardLike = (req, res, next) => {
   Card.findByIdAndUpdate(
@@ -79,18 +53,14 @@ const addCardLike = (req, res, next) => {
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Передан несуществующий _id карточки')
-        // return res.status(NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' })
       }
       return res.status(OK).send({ data: card })
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new BadRequestErr('Переданы некорректные данные для постановки/снятии лайка'))
-        // return res.status(BAD_REQUEST)
-        // .send({ message: 'Переданы некорректные данные для постановки/снятии лайка' })
       }
       next(err)
-      // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
     })
 }
 
@@ -103,18 +73,14 @@ const removeCardLike = (req, res, next) => {
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Передан несуществующий _id карточки')
-        // return res.status(NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' })
       }
       return res.status(OK).send({ data: card })
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new BadRequestErr('Переданы некорректные данные для постановки/снятии лайка'))
-        // return res.status(BAD_REQUEST)
-        // .send({ message: 'Переданы некорректные данные для постановки/снятии лайка' })
       }
       next(err)
-      // return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' })
     })
 }
 
