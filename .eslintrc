@@ -10,6 +10,11 @@
       }
     ],
     "semi": 0,
-    "no-console": 0
+    "no-console": 0,
+    "no-useless-escape": 0,
+    "func-names": [
+      "error",
+      "never"
+    ]
   }
 }
